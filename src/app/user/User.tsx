@@ -6,8 +6,6 @@ import { userService } from "../api/users";
 import {
   Container,
   Typography,
-  Select,
-  MenuItem,
   TextField,
   Radio,
   RadioGroup,
@@ -16,7 +14,7 @@ import {
   FormLabel,
   Button,
   Box,
-  InputLabel,
+  Autocomplete,
 } from "@mui/material";
 import { eachDayOfInterval, format, nextSaturday, nextSunday } from "date-fns";
 
@@ -29,7 +27,7 @@ const getNextWeekends = () => {
   const dayNumbers = days.map((date) => format(date, "d"));
 
   return `${dayNumbers.join(", ")}`;
-}
+};
 
 export function UserForm() {
   const [users, setUsers] = useState<User[]>([]);
@@ -68,11 +66,18 @@ export function UserForm() {
     }
   };
 
+  const handleAutocompleteChange = (event: any, newValue: User | null) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      user_id: newValue ? newValue.id.toString() : "",
+    }));
+  };
+
   const validateNumberOrder = (value: string) => {
-    const regex = /^\d{2}-\d{6}$/;
+    const regex = /^\d+-\d+$/;
     if (!regex.test(value)) {
       setNumberOrderError(
-        "Номер заказа должен соответствовать формату: 12-345678"
+        "Номер заказа должен соответствовать формату: цифры-цифры"
       );
     } else {
       setNumberOrderError(null);
@@ -128,24 +133,20 @@ export function UserForm() {
             {formError}
           </Typography>
         )}
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="user-select-label">Выберите ФИО</InputLabel>
-          <Select
-            labelId="user-select-label"
-            name="user_id"
-            value={formData.user_id}
-            onChange={handleChange}
-          >
-            <MenuItem value="">
-              <em>Выберите ФИО</em>
-            </MenuItem>
-            {users.map((user) => (
-              <MenuItem key={user.id} value={user.id}>
-                {user.fio}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Autocomplete
+          options={users}
+          getOptionLabel={(option) => option.fio}
+          onChange={handleAutocompleteChange}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Выберите ФИО"
+              placeholder="Начните вводить ФИО"
+              fullWidth
+              margin="normal"
+            />
+          )}
+        />
         <TextField
           label="Дата выхода"
           placeholder="Введите дату"

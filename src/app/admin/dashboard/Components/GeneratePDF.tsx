@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { font } from "../../../../../public/Times New Roman.js";
@@ -13,7 +13,13 @@ import {
   Box,
   FormLabel,
 } from "@mui/material";
-import { format, parse, eachDayOfInterval, nextSaturday, nextSunday } from "date-fns";
+import {
+  format,
+  parse,
+  eachDayOfInterval,
+  nextSaturday,
+  nextSunday,
+} from "date-fns";
 import { ru } from "date-fns/locale";
 
 const addTNWFont = (doc: jsPDF) => {
@@ -50,8 +56,6 @@ export function GeneratePDF() {
     orderNumber: "1",
     orderDate: format(new Date(), "yyyy-MM-dd"),
   });
-
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -162,9 +166,7 @@ export function GeneratePDF() {
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
 
-    if (iframeRef.current) {
-      iframeRef.current.src = pdfUrl;
-    }
+    window.open(pdfUrl, "_blank");
   }, [pdfData]);
 
   return (
@@ -227,12 +229,6 @@ export function GeneratePDF() {
               Сгенерировать PDF файл
             </Button>
           </Box>
-        </Box>
-        <Box mt={2}>
-          <iframe
-            ref={iframeRef}
-            style={{ width: "100%", height: "500px", border: "none" }}
-          ></iframe>
         </Box>
       </Box>
     </Container>
